@@ -25,9 +25,24 @@ jobs:
       - store_artifacts:
           path: ./articles/lets-start-js.pdf
           destination: generated PDF data
-
+  deploy:
+    working_directory: /book
+    docker:
+      - image: vvakame/review
+    steps:
+      - checkout
+      - run: npm install --no-save
+      - run: npm run web
+      - run: npm run deploy
+  
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
+      - deploy:
+        requires:
+          - build
+        filters:
+          branches:
+            only:master
